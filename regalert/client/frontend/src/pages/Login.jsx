@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import API from "../utils/api";
@@ -20,7 +20,6 @@ const Login = () => {
 
     try {
       const { data } = await API.post("/auth/login", formData);
-
       localStorage.setItem("userInfo", JSON.stringify(data));
       navigate("/dashboard");
     } catch (error) {
@@ -29,47 +28,70 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-8 rounded shadow-md w-96"
-      >
-        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 p-4">
+      
+      {/* Glass Card */}
+      <div className="backdrop-blur-lg bg-white/20 border border-white/30 shadow-2xl rounded-2xl p-8 w-full max-w-md text-white">
+        
+        {/* Logo / Branding */}
+        <div className="text-center mb-6">
+          <h1 className="text-4xl font-extrabold tracking-wide">
+            🚀 RegAlert
+          </h1>
+          <p className="text-sm mt-2 text-gray-200">
+            Never Miss Any Opportunity Again
+          </p>
+        </div>
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          className="w-full mb-4 p-2 border rounded"
-          onChange={handleChange}
-          autoComplete="email"
-          required
-        />
+        {/* Login Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          
+          <div>
+            <label className="text-sm">Email</label>
+            <input
+              type="email"
+              name="email"
+              placeholder="Enter your email"
+              className="w-full mt-1 p-3 rounded-lg bg-white/30 placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-white"
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          className="w-full mb-4 p-2 border rounded"
-          onChange={handleChange}
-          autoComplete="current-password"
-          required
-        />
+          <div>
+            <label className="text-sm">Password</label>
+            <input
+              type="password"
+              name="password"
+              placeholder="Enter your password"
+              className="w-full mt-1 p-3 rounded-lg bg-white/30 placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-white"
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <button
-          type="submit"
-          className="w-full bg-green-600 text-white p-2 rounded hover:bg-green-700"
-        >
-          Login
-        </button>
+          <button
+            type="submit"
+            className="w-full py-3 rounded-lg bg-white text-indigo-600 font-bold hover:scale-105 transition-transform duration-200"
+          >
+            Login
+          </button>
+        </form>
 
-        <p className="mt-4 text-center">
-          Don’t have account?{" "}
-          <Link to="/register" className="text-blue-600">
-            Register
+        {/* Divider */}
+        <div className="my-6 border-t border-white/40"></div>
+
+        {/* Footer */}
+        <p className="text-center text-sm">
+          Don’t have an account?{" "}
+          <Link
+            to="/register"
+            className="underline hover:text-gray-200"
+          >
+            Create Account
           </Link>
         </p>
-      </form>
+      </div>
     </div>
   );
 };

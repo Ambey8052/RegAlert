@@ -1,7 +1,6 @@
-
-import React from 'react';
+import React from "react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import API from "../utils/api";
 
 const Register = () => {
@@ -21,60 +20,91 @@ const Register = () => {
     e.preventDefault();
 
     try {
-      const { data } = await API.post("/auth/register", formData);
-
-      localStorage.setItem("userInfo", JSON.stringify(data));
-      navigate("/dashboard");
+      await API.post("/auth/register", formData);
+      navigate("/");
     } catch (error) {
-      alert(error.response?.data?.message || "Error");
+      alert(error.response?.data?.message || "Registration Failed");
     }
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-8 rounded shadow-md w-96"
-      >
-        <h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 p-4">
 
-        <input
-          type="text"
-          name="name"
-          placeholder="Name"
-          className="w-full mb-4 p-2 border rounded"
-          onChange={handleChange}
-          autoComplete="name"
-          required
-        />
+      {/* Glass Card */}
+      <div className="backdrop-blur-lg bg-white/20 border border-white/30 shadow-2xl rounded-2xl p-8 w-full max-w-md text-white">
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          className="w-full mb-4 p-2 border rounded"
-          onChange={handleChange}
-          autoComplete="email"
-          required
-        />
+        {/* Branding */}
+        <div className="text-center mb-6">
+          <h1 className="text-4xl font-extrabold tracking-wide">
+            🚀 RegAlert
+          </h1>
+          <p className="text-sm mt-2 text-gray-200">
+            Create Your Opportunity Manager
+          </p>
+        </div>
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          className="w-full mb-4 p-2 border rounded"
-          onChange={handleChange}
-          autoComplete="current-password"
-          required
-        />
+        {/* Register Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
 
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
-        >
-          Register
-        </button>
-      </form>
+          <div>
+            <label className="text-sm">Full Name</label>
+            <input
+              type="text"
+              name="name"
+              placeholder="Enter your full name"
+              className="w-full mt-1 p-3 rounded-lg bg-white/30 placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-white"
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="text-sm">Email</label>
+            <input
+              type="email"
+              name="email"
+              placeholder="Enter your email"
+              className="w-full mt-1 p-3 rounded-lg bg-white/30 placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-white"
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="text-sm">Password</label>
+            <input
+              type="password"
+              name="password"
+              placeholder="Create a password"
+              className="w-full mt-1 p-3 rounded-lg bg-white/30 placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-white"
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full py-3 rounded-lg bg-white text-indigo-600 font-bold hover:scale-105 transition-transform duration-200"
+          >
+            Create Account
+          </button>
+        </form>
+
+        {/* Divider */}
+        <div className="my-6 border-t border-white/40"></div>
+
+        {/* Footer */}
+        <p className="text-center text-sm">
+          Already have an account?{" "}
+          <Link
+            to="/"
+            className="underline hover:text-gray-200"
+          >
+            Login
+          </Link>
+        </p>
+
+      </div>
     </div>
   );
 };

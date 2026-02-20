@@ -1,39 +1,29 @@
+
+import React from "react";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import API from "../utils/api";
 
 const Dashboard = () => {
-  const navigate = useNavigate();
-
   const [events, setEvents] = useState([]);
   const [formData, setFormData] = useState({
     title: "",
-    organization: "",
-    eventDate: "",
-    registrationLink: "",
+    link: "",
+    date: "",
     emailUsed: "",
     passwordUsed: "",
-    reminderTime: "",
   });
 
-  // Protect Route + Fetch Events
-  useEffect(() => {
-    const userInfo = localStorage.getItem("userInfo");
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
-    if (!userInfo) {
-      navigate("/");
-    } else {
-      fetchEvents();
-    }
+  useEffect(() => {
+    fetchEvents();
   }, []);
 
   const fetchEvents = async () => {
-    try {
-      const { data } = await API.get("/events");
-      setEvents(data);
-    } catch (error) {
-      console.log("Error fetching events:", error);
-    }
+    const { data } = await API.get("/events");
+    setEvents(data);
   };
 
   const handleChange = (e) => {
@@ -42,163 +32,163 @@ const Dashboard = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    try {
-      await API.post("/events", formData);
-      alert("Event Added Successfully!");
-      setFormData({
-        title: "",
-        organization: "",
-        eventDate: "",
-        registrationLink: "",
-        emailUsed: "",
-        passwordUsed: "",
-        reminderTime: "",
-      });
-      fetchEvents();
-    } catch (error) {
-      alert("Error adding event");
-    }
+    await API.post("/events", formData);
+    fetchEvents();
   };
 
-  const logoutHandler = () => {
-    localStorage.removeItem("userInfo");
-    navigate("/");
+  const deleteEvent = async (id) => {
+    await API.delete(`/events/${id}`);
+    fetchEvents();
   };
+
+  const now = new Date();
+
+  const upcoming = events.filter(e => new Date(e.date) > now).length;
+  const completed = events.filter(e => new Date(e.date) < now).length;
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">RegAlert Dashboard</h1>
-        <button
-          onClick={logoutHandler}
-          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-        >
-          Logout
-        </button>
-      </div>
+    <div className="min-h-screen bg-gray-100">
+      <Navbar />
+      {/* Navbar */}
+      {/* <div className="bg-indigo-600 text-white p-4 flex justify-between items-center shadow-md">
+        <h1 className="text-2xl font-bold">🚀 RegAlert Dashboard</h1>
+        <div>
+          <span className="mr-4">Welcome, {userInfo?.name}</span>
+          <button
+            onClick={() => {
+              localStorage.removeItem("userInfo");
+              window.location.href = "/";
+            }}
+            className="bg-white text-indigo-600 px-4 py-1 rounded-lg font-semibold hover:bg-gray-200"
+          >
+            Logout
+          </button>
+        </div>
+      </div> */}
 
-      {/* Add Event Form */}
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-6 rounded shadow mb-8 grid gap-4"
-      >
-        <h2 className="text-xl font-semibold mb-2">Add New Event</h2>
+      <div className="p-6">
 
-        <input
-          name="title"
-          value={formData.title}
-          placeholder="Event Title"
-          onChange={handleChange}
-          className="border p-2 rounded"
-          required
-        />
+        {/* Stats Tiles */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 
-        <input
-          name="organization"
-          value={formData.organization}
-          placeholder="Organization Name"
-          onChange={handleChange}
-          className="border p-2 rounded"
-          required
-        />
+          <div className="bg-white p-6 rounded-xl shadow-lg">
+            <h2 className="text-gray-500">Total Registrations</h2>
+            <p className="text-3xl font-bold text-indigo-600">{events.length}</p>
+          </div>
 
-        <input
-          type="datetime-local"
-          name="eventDate"
-          value={formData.eventDate}
-          onChange={handleChange}
-          className="border p-2 rounded"
-          required
-        />
+          <div className="bg-white p-6 rounded-xl shadow-lg">
+            <h2 className="text-gray-500">Upcoming Events</h2>
+            <p className="text-3xl font-bold text-green-500">{upcoming}</p>
+          </div>
 
-        <input
-          name="registrationLink"
-          value={formData.registrationLink}
-          placeholder="Registration Link"
-          onChange={handleChange}
-          className="border p-2 rounded"
-        />
+          <div className="bg-white p-6 rounded-xl shadow-lg">
+            <h2 className="text-gray-500">Completed Events</h2>
+            <p className="text-3xl font-bold text-red-500">{completed}</p>
+          </div>
 
-        <input
-          name="emailUsed"
-          value={formData.emailUsed}
-          placeholder="Email Used"
-          onChange={handleChange}
-          className="border p-2 rounded"
-        />
+        </div>
 
-        <input
-          name="passwordUsed"
-          value={formData.passwordUsed}
-          placeholder="Password Used"
-          onChange={handleChange}
-          className="border p-2 rounded"
-        />
+        {/* Add Event Form */}
+        <div className="bg-white p-6 rounded-xl shadow-lg mb-8">
+          <h2 className="text-xl font-bold mb-4 text-indigo-600">➕ Add New Registration</h2>
 
-        <input
-          type="datetime-local"
-          name="reminderTime"
-          value={formData.reminderTime}
-          onChange={handleChange}
-          className="border p-2 rounded"
-        />
+          <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-4">
+            <input
+              type="text"
+              name="title"
+              placeholder="Event Title"
+              className="p-3 border rounded-lg focus:ring-2 focus:ring-indigo-400"
+              onChange={handleChange}
+              required
+            />
+            <input
+              type="url"
+              name="link"
+              placeholder="Registration Link"
+              className="p-3 border rounded-lg focus:ring-2 focus:ring-indigo-400"
+              onChange={handleChange}
+              required
+            />
+            <input
+              type="datetime-local"
+              name="date"
+              className="p-3 border rounded-lg focus:ring-2 focus:ring-indigo-400"
+              onChange={handleChange}
+              required
+            />
+            <input
+              type="email"
+              name="emailUsed"
+              placeholder="Email Used"
+              className="p-3 border rounded-lg focus:ring-2 focus:ring-indigo-400"
+              onChange={handleChange}
+            />
+            <input
+              type="text"
+              name="passwordUsed"
+              placeholder="Password Used"
+              className="p-3 border rounded-lg focus:ring-2 focus:ring-indigo-400"
+              onChange={handleChange}
+            />
 
-        <button className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700">
-          Add Event
-        </button>
-      </form>
+            <button
+              type="submit"
+              className="col-span-2 bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition"
+            >
+              Save Registration
+            </button>
+          </form>
+        </div>
 
-      {/* Events List */}
-      <div>
-        <h2 className="text-2xl font-semibold mb-4">Your Events</h2>
+        {/* Events Grid */}
+        <div>
+          <h2 className="text-xl font-bold mb-4 text-indigo-600">📅 Your Registrations</h2>
 
-        {events.length === 0 ? (
-          <p className="text-gray-600">No events added yet.</p>
-        ) : (
-          <div className="grid gap-4">
+          <div className="grid md:grid-cols-3 gap-6">
             {events.map((event) => (
               <div
                 key={event._id}
-                className="bg-white p-4 rounded shadow"
+                className="bg-white rounded-xl shadow-lg p-5 hover:shadow-2xl transition duration-300"
               >
-                <h3 className="text-xl font-bold">{event.title}</h3>
-                <p><strong>Organization:</strong> {event.organization}</p>
-                <p>
-                  <strong>Date:</strong>{" "}
-                  {new Date(event.eventDate).toLocaleString()}
+                <h3 className="text-lg font-bold text-indigo-600 mb-2">
+                  {event.title}
+                </h3>
+
+                <p className="text-sm text-gray-600 mb-1">
+                  📅 {new Date(event.date).toLocaleString()}
                 </p>
-                {event.registrationLink && (
-                  <p>
-                    <strong>Link:</strong>{" "}
-                    <a
-                      href={event.registrationLink}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-blue-600 underline"
-                    >
-                      Open Link
-                    </a>
-                  </p>
-                )}
-                {event.emailUsed && (
-                  <p><strong>Email Used:</strong> {event.emailUsed}</p>
-                )}
-                {event.passwordUsed && (
-                  <p><strong>Password Used:</strong> {event.passwordUsed}</p>
-                )}
-                {event.reminderTime && (
-                  <p>
-                    <strong>Reminder:</strong>{" "}
-                    {new Date(event.reminderTime).toLocaleString()}
-                  </p>
-                )}
+
+                <p className="text-sm text-gray-600 mb-1">
+                  📧 {event.emailUsed}
+                </p>
+
+                <p className="text-sm text-gray-600 mb-2">
+                  🔒 {event.passwordUsed ? "••••••••" : "Not Stored"}
+                </p>
+
+                <a
+                  href={event.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-indigo-500 underline text-sm"
+                >
+                  🔗 Open Registration
+                </a>
+
+                <button
+                  onClick={() => deleteEvent(event._id)}
+                  className="mt-4 w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition"
+                >
+                  Delete
+                </button>
               </div>
             ))}
           </div>
-        )}
+
+        </div>
+
       </div>
+      <Footer />
     </div>
   );
 };
